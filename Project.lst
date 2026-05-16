@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/12/26 00:22:29
+Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 <Algorithms via Procedures and Modularization     (Proj4_gua  Page 1 - 1
 
 
@@ -34,7 +34,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/12/26 00:22:29
 				; (insert macro definitions here)
 
  = 00000001			ROWS_MIN = 1
- = 0000000D			ROWS_MAX = 13
+ = 00000014			ROWS_MAX = 20
 
  00000000			.data
 
@@ -47,13 +47,13 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/12/26 00:22:29
 	   69 65 6C 20 47
 	   75 61 72 64 61
 	   64 6F 0D 0A 00
- 0000002D 54 68 69 73 20	programIntro	BYTE	"This program can print up to 13 rows of Pascal's Triangle, per your specification.",13,10,0
+ 0000002D 54 68 69 73 20	programIntro	BYTE	"This program can print up to 20 rows of Pascal's Triangle, per your specification.",13,10,0
 	   70 72 6F 67 72
 	   61 6D 20 63 61
 	   6E 20 70 72 69
 	   6E 74 20 75 70
-	   20 74 6F 20 31
-	   33 20 72 6F 77
+	   20 74 6F 20 32
+	   30 20 72 6F 77
 	   73 20 6F 66 20
 	   50 61 73 63 61
 	   6C 27 73 20 54
@@ -64,7 +64,21 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/12/26 00:22:29
 	   65 63 69 66 69
 	   63 61 74 69 6F
 	   6E 2E 0D 0A 00
- 00000082 45 6E 74 65 72	rowInputPrompt	BYTE	"Enter total number of rows to print [1...13]: ",0
+ 00000082 2A 2A 45 43 3A	extraCredit2	BYTE	"**EC: This program prints up to 20 rows of Pascal's Triangle.",13,10,13,10,0
+	   20 54 68 69 73
+	   20 70 72 6F 67
+	   72 61 6D 20 70
+	   72 69 6E 74 73
+	   20 75 70 20 74
+	   6F 20 32 30 20
+	   72 6F 77 73 20
+	   6F 66 20 50 61
+	   73 63 61 6C 27
+	   73 20 54 72 69
+	   61 6E 67 6C 65
+	   2E 0D 0A 0D 0A
+	   00
+ 000000C4 45 6E 74 65 72	rowInputPrompt	BYTE	"Enter total number of rows to print [1...20]: ",0
 	   20 74 6F 74 61
 	   6C 20 6E 75 6D
 	   62 65 72 20 6F
@@ -72,65 +86,186 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/12/26 00:22:29
 	   73 20 74 6F 20
 	   70 72 69 6E 74
 	   20 5B 31 2E 2E
-	   2E 31 33 5D 3A
+	   2E 32 30 5D 3A
 	   20 00
- 000000B1 49 6E 70 75 74	errorMessage	BYTE	"Input value is not within 1-13, please try again.",13,10,0
+ 000000F3 49 6E 70 75 74	errorMessage	BYTE	"Input value is not within 1-20, please try again.",13,10,0
 	   20 76 61 6C 75
 	   65 20 69 73 20
 	   6E 6F 74 20 77
 	   69 74 68 69 6E
-	   20 31 2D 31 33
+	   20 31 2D 32 30
 	   2C 20 70 6C 65
 	   61 73 65 20 74
 	   72 79 20 61 67
 	   61 69 6E 2E 0D
 	   0A 00
+ 00000127 54 68 61 6E 6B	farewellMessage	BYTE	"Thank you for using Pascal Triangle Program. Goodbye.",13,10,0
+	   20 79 6F 75 20
+	   66 6F 72 20 75
+	   73 69 6E 67 20
+	   50 61 73 63 61
+	   6C 20 54 72 69
+	   61 6E 67 6C 65
+	   20 50 72 6F 67
+	   72 61 6D 2E 20
+	   47 6F 6F 64 62
+	   79 65 2E 0D 0A
+	   00
 
- 000000E5 00000000		userInput		DWORD	?
+ 0000015F 00000000		userInput		DWORD	?
 
 
  00000000			.code
  00000000			main PROC
- 00000000  E8 0000000C			call introduction
- 00000005  E8 0000001C			call getUserInput
+					; Introduce user, print full pascal triangle based on row input, and display goodbye message.
+ 00000000  E8 00000016			call introduction
+ 00000005  E8 00000030			call getUserInput
+ 0000000A  E8 00000056			call printPascalTriangle
+ 0000000F  E8 000000B6			call farewell
+					Invoke ExitProcess,0
+ 00000014  6A 00	   *	    push   +000000000h
+ 00000016  E8 00000000 E   *	    call   ExitProcess
+ 0000001B			main ENDP
 
-
-					Invoke ExitProcess,0	; exit to operating system
- 0000000A  6A 00	   *	    push   +000000000h
- 0000000C  E8 00000000 E   *	    call   ExitProcess
- 00000011			main ENDP
-
- 00000011			introduction PROC
- 00000011  BA 00000000 R		mov		edx, OFFSET programTitle
- 00000016  E8 00000000 E		call	WriteString
- 0000001B  BA 0000002D R		mov		edx, OFFSET programIntro
+				; ------------------------------------------------------------
+				; Name: introduction
+				; 
+				; Introduce the program title and introduction for the user.
+				;
+				; Preconditions: none
+				;
+				; Postconditions: none
+				;
+				; Receives: none
+				;
+				; Returns: none
+				; ------------------------------------------------------------
+ 0000001B			introduction PROC
+ 0000001B  BA 00000000 R		mov		edx, OFFSET programTitle
  00000020  E8 00000000 E		call	WriteString
- 00000025  C3				ret
- 00000026			introduction ENDP
+ 00000025  BA 0000002D R		mov		edx, OFFSET programIntro
+ 0000002A  E8 00000000 E		call	WriteString
+ 0000002F  BA 00000082 R		mov		edx, OFFSET extraCredit2
+ 00000034  E8 00000000 E		call	WriteString
+ 00000039  C3				ret
+ 0000003A			introduction ENDP
 
- 00000026			getUserInput PROC
- 00000026				_getInput:
- 00000026  BA 00000082 R			mov		edx, OFFSET rowInputPrompt
- 0000002B  E8 00000000 E			call	WriteString
- 00000030  E8 00000000 E			call	ReadInt
- 00000035  83 F8 01				cmp		eax, ROWS_MIN
- 00000038  7C 0B				jl		_error
- 0000003A  83 F8 0D				cmp		eax, ROWS_MAX
- 0000003D  7F 06				jg		_error
- 0000003F  A3 000000E5 R			mov		userInput, eax
- 00000044  C3					ret
- 00000045				_error:
- 00000045  BA 000000B1 R			mov		edx, OFFSET errorMessage
- 0000004A  E8 00000000 E			call	WriteString
- 0000004F  EB D5				jmp		_getInput
- 00000051			getUserInput ENDP
+				; -----------------------------------------------------------------------------------------
+				; Name: getUserInput
+				; 
+				; Gets an integer from the user and validates it to make sure its in the range 1-13.
+				;
+				; Preconditions: none
+				;
+				; Postconditions: none
+				;
+				; Receives: none
+				;
+				; Returns: userInput = validated user integer in range 1-13
+				; -----------------------------------------------------------------------------------------
+ 0000003A			getUserInput PROC
+ 0000003A				_getInput:
+ 0000003A  BA 000000C4 R			mov		edx, OFFSET rowInputPrompt
+ 0000003F  E8 00000000 E			call	WriteString
+ 00000044  E8 00000000 E			call	ReadInt
+ 00000049  83 F8 01				cmp		eax, ROWS_MIN
+ 0000004C  7C 0B				jl		_error
+ 0000004E  83 F8 14				cmp		eax, ROWS_MAX
+ 00000051  7F 06				jg		_error
+ 00000053  A3 0000015F R			mov		userInput, eax
+ 00000058  C3					ret
+ 00000059				_error:
+ 00000059  BA 000000F3 R			mov		edx, OFFSET errorMessage
+ 0000005E  E8 00000000 E			call	WriteString
+ 00000063  EB D5				jmp		_getInput
+ 00000065			getUserInput ENDP
 
+				; ------------------------------------------------------------
+				; Name: printPascalTriangle
+				; 
+				; Introduce the program title and introduction for the user.
+				;
+				; Preconditions: none
+				;
+				; Postconditions: none
+				;
+				; Receives: none
+				;
+				; Returns: none
+				; ------------------------------------------------------------
+ 00000065			printPascalTriangle PROC
+ 00000065  E8 00000000 E		call	CrLf
+ 0000006A  8B 0D 0000015F R		mov		ecx, userInput
+ 00000070				_printRow:
+ 00000070  51					push	ecx
+ 00000071  E8 00000004				call	printPascalRow
+ 00000076  59					pop		ecx
+ 00000077  E2 F7				loop	_printRow
+ 00000079  C3				ret
+ 0000007A			printPascalTriangle ENDP
 
+ 0000007A			printPascalRow PROC
+ 0000007A  A1 0000015F R		mov  eax, userInput
+ 0000007F  2B C1			sub  eax, ecx         ; eax = current row 'n' (0-indexed)
+ 00000081  8B D8			mov  ebx, eax         ; ebx = n (parameter for nChooseK)
+					
+ 00000083  BF 00000000			mov  edi, 0           ; edi = k counter (starts at 0)
+ 00000088  8B D1			mov  edx, ecx         ; Save outer loop counter in EDX safely
 
+ 0000008A				_rowLoop:
+ 0000008A  3B FB				cmp  edi, ebx         ; Loop while k <= n
+ 0000008C  7F 11				jg   _rowFinished
 
+ 0000008E  8B C7				mov  eax, edi         ; eax = k (parameter for nChooseK)
+ 00000090  E8 00000012				call nChooseK         ; Calculates and prints the number
+					
+ 00000095  B0 20				mov  al, ' '          ; Print a space spacer
+ 00000097  E8 00000000 E			call WriteChar
+
+ 0000009C  47					inc  edi              ; k++
+ 0000009D  EB EB				jmp  _rowLoop
+
+ 0000009F				_rowFinished:
+ 0000009F  E8 00000000 E			call CrLf
+ 000000A4  8B CA				mov  ecx, edx         ; Restore outer loop counter to ECX
+ 000000A6  C3					ret
+ 000000A7			printPascalRow ENDP
+
+ 000000A7			nChooseK PROC
+ 000000A7  53				push ebx              ; Preserve registers we will mutate
+ 000000A8  51				push ecx
+
+ 000000A9  8B C8			mov  ecx, eax         ; ecx = k (our loop limit)
+ 000000AB  B8 00000001			mov  eax, 1           ; Running total starts at 1
+ 000000B0  BE 00000001			mov  esi, 1           ; esi = running divisor (starts at 1)
+
+ 000000B5  83 F9 00			cmp  ecx, 0           ; If k == 0, skip loop completely (result is 1)
+ 000000B8  74 08			je   _printResult
+
+ 000000BA				_calcLoop:
+ 000000BA  F7 E3				mul  ebx              ; edx:eax = total * n
+ 000000BC  F7 F6				div  esi              ; eax = total / divisor
+					
+ 000000BE  4B					dec  ebx              ; n--
+ 000000BF  46					inc  esi              ; divisor++
+ 000000C0  E2 F8				loop _calcLoop        ; Decrements ECX and loops until ECX == 0
+
+ 000000C2				_printResult:
+ 000000C2  E8 00000000 E			call WriteDec
+					
+ 000000C7  59					pop  ecx              ; Restore registers
+ 000000C8  5B					pop  ebx
+ 000000C9  C3					ret
+ 000000CA			nChooseK ENDP
+
+ 000000CA			farewell PROC
+ 000000CA  E8 00000000 E		call CrlF
+ 000000CF  BA 00000127 R		mov		edx, OFFSET farewellMessage
+ 000000D4  E8 00000000 E		call	WriteString
+ 000000D9			farewell ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/12/26 00:22:29
+Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 <Algorithms via Procedures and Modularization     (Proj4_gua  Symbols 2 - 1
 
 
@@ -224,8 +359,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000000E9 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000051 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000163 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000D9 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -332,11 +467,20 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-getUserInput . . . . . . . . . .	P Near	 00000026 _TEXT	Length= 0000002B Public STDCALL
-  _getInput  . . . . . . . . . .	L Near	 00000026 _TEXT	
-  _error . . . . . . . . . . . .	L Near	 00000045 _TEXT	
-introduction . . . . . . . . . .	P Near	 00000011 _TEXT	Length= 00000015 Public STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000011 Public STDCALL
+farewell . . . . . . . . . . . .	P Near	 000000CA _TEXT	Length= 0000000F Public STDCALL
+getUserInput . . . . . . . . . .	P Near	 0000003A _TEXT	Length= 0000002B Public STDCALL
+  _getInput  . . . . . . . . . .	L Near	 0000003A _TEXT	
+  _error . . . . . . . . . . . .	L Near	 00000059 _TEXT	
+introduction . . . . . . . . . .	P Near	 0000001B _TEXT	Length= 0000001F Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001B Public STDCALL
+nChooseK . . . . . . . . . . . .	P Near	 000000A7 _TEXT	Length= 00000023 Public STDCALL
+  _calcLoop  . . . . . . . . . .	L Near	 000000BA _TEXT	
+  _printResult . . . . . . . . .	L Near	 000000C2 _TEXT	
+printPascalRow . . . . . . . . .	P Near	 0000007A _TEXT	Length= 0000002D Public STDCALL
+  _rowLoop . . . . . . . . . . .	L Near	 0000008A _TEXT	
+  _rowFinished . . . . . . . . .	L Near	 0000009F _TEXT	
+printPascalTriangle  . . . . . .	P Near	 00000065 _TEXT	Length= 00000015 Public STDCALL
+  _printRow  . . . . . . . . . .	L Near	 00000070 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -462,7 +606,7 @@ OPEN_EXISTING  . . . . . . . . .	Number	 00000003h
 PeekConsoleInput . . . . . . . .	Text   	 PeekConsoleInputA
 RIGHT_ALT_PRESSED  . . . . . . .	Number	 00000001h   
 RIGHT_CTRL_PRESSED . . . . . . .	Number	 00000004h   
-ROWS_MAX . . . . . . . . . . . .	Number	 0000000Dh   
+ROWS_MAX . . . . . . . . . . . .	Number	 00000014h   
 ROWS_MIN . . . . . . . . . . . .	Number	 00000001h   
 ReadConsoleInput . . . . . . . .	Text   	 ReadConsoleInputA
 ReadConsole  . . . . . . . . . .	Text   	 ReadConsoleA
@@ -561,8 +705,10 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
-errorMessage . . . . . . . . . .	Byte	 000000B1 _DATA	
+errorMessage . . . . . . . . . .	Byte	 000000F3 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
+extraCredit2 . . . . . . . . . .	Byte	 00000082 _DATA	
+farewellMessage  . . . . . . . .	Byte	 00000127 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
@@ -575,8 +721,8 @@ magenta  . . . . . . . . . . . .	Number	 00000005h
 programIntro . . . . . . . . . .	Byte	 0000002D _DATA	
 programTitle . . . . . . . . . .	Byte	 00000000 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-rowInputPrompt . . . . . . . . .	Byte	 00000082 _DATA	
-userInput  . . . . . . . . . . .	DWord	 000000E5 _DATA	
+rowInputPrompt . . . . . . . . .	Byte	 000000C4 _DATA	
+userInput  . . . . . . . . . . .	DWord	 0000015F _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
