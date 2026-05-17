@@ -1,16 +1,17 @@
-Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
-<Algorithms via Procedures and Modularization     (Proj4_gua  Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
+/Pascal Triangle Program    (Proj4_guardadd.asm		     Page 1 - 1
 
 
-				TITLE Algorithms via Procedures and Modularization     (Proj4_guardadd.asm)
+				TITLE Pascal Triangle Program    (Proj4_guardadd.asm)
 
 				; Author: Daniel Guardado
-				; Last Modified: 5/11/2026
+				; Last Modified: 5/17/2026
 				; OSU email address: guardadd@oregonstate.edu
 				; Course number/section:   CS271 Section 400
 				; Project Number: 4               Due Date: 5/17/2026
-				; Description: ********************************
-				;              when developing assembly projects in CS271.
+				; Description:	This program gets a user value in the range 1-20 (for row count) to be used for forming a
+				;				Pascal Triangle. The appropriate element values in each row are then calculated through
+				;				n-choose-k operations until every row has been displayed with proper values.
 
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
@@ -31,14 +32,11 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 			      C .LIST
 			      C 
 
-				; (insert macro definitions here)
-
  = 00000001			ROWS_MIN = 1
  = 00000014			ROWS_MAX = 20
 
  00000000			.data
-
- 00000000 50 61 73 63 61	programTitle	BYTE	"Pascal Triangle Program by Daniel Guardado",13,10,0
+ 00000000 50 61 73 63 61		programTitle	BYTE	"Pascal Triangle Program by Daniel Guardado",13,10,0
 	   6C 20 54 72 69
 	   61 6E 67 6C 65
 	   20 50 72 6F 67
@@ -47,7 +45,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 	   69 65 6C 20 47
 	   75 61 72 64 61
 	   64 6F 0D 0A 00
- 0000002D 54 68 69 73 20	programIntro	BYTE	"This program can print up to 20 rows of Pascal's Triangle, per your specification.",13,10,0
+ 0000002D 54 68 69 73 20		programIntro	BYTE	"This program can print up to 20 rows of Pascal's Triangle, per your specification.",13,10,0
 	   70 72 6F 67 72
 	   61 6D 20 63 61
 	   6E 20 70 72 69
@@ -64,7 +62,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 	   65 63 69 66 69
 	   63 61 74 69 6F
 	   6E 2E 0D 0A 00
- 00000082 2A 2A 45 43 3A	extraCredit2	BYTE	"**EC: This program prints up to 20 rows of Pascal's Triangle.",13,10,13,10,0
+ 00000082 2A 2A 45 43 3A		extraCredit2	BYTE	"**EC: This program prints up to 20 rows of Pascal's Triangle.",13,10,13,10,0
 	   20 54 68 69 73
 	   20 70 72 6F 67
 	   72 61 6D 20 70
@@ -78,7 +76,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 	   61 6E 67 6C 65
 	   2E 0D 0A 0D 0A
 	   00
- 000000C4 45 6E 74 65 72	rowInputPrompt	BYTE	"Enter total number of rows to print [1...20]: ",0
+ 000000C4 45 6E 74 65 72		rowInputPrompt	BYTE	"Enter total number of rows to print [1...20]: ",0
 	   20 74 6F 74 61
 	   6C 20 6E 75 6D
 	   62 65 72 20 6F
@@ -88,7 +86,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 	   20 5B 31 2E 2E
 	   2E 32 30 5D 3A
 	   20 00
- 000000F3 49 6E 70 75 74	errorMessage	BYTE	"Input value is not within 1-20, please try again.",13,10,0
+ 000000F3 49 6E 70 75 74		errorMessage	BYTE	"Input value is not within 1-20, please try again.",13,10,0
 	   20 76 61 6C 75
 	   65 20 69 73 20
 	   6E 6F 74 20 77
@@ -99,7 +97,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 	   72 79 20 61 67
 	   61 69 6E 2E 0D
 	   0A 00
- 00000127 54 68 61 6E 6B	farewellMessage	BYTE	"Thank you for using Pascal Triangle Program. Goodbye.",13,10,0
+ 00000127 54 68 61 6E 6B		farewellMessage	BYTE	"Thank you for using Pascal Triangle Program. Goodbye.",13,10,0
 	   20 79 6F 75 20
 	   66 6F 72 20 75
 	   73 69 6E 67 20
@@ -112,34 +110,37 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 	   79 65 2E 0D 0A
 	   00
 
- 0000015F 00000000		userInput		DWORD	?
-
+ 0000015F 00000000			userInput		DWORD	?	; Holds row integer value
 
  00000000			.code
+				; -------------------------------------------------------------------------
+				; Name: main
+				; 
+				; Program entry point where procedures are called to display introduction,
+				; get user input, print pascal triangle, and display departing message.
+				; -------------------------------------------------------------------------
  00000000			main PROC
-					; Introduce user, print full pascal triangle based on row input, and display goodbye message.
- 00000000  E8 00000016			call introduction
- 00000005  E8 00000030			call getUserInput
- 0000000A  E8 00000056			call printPascalTriangle
- 0000000F  E8 000000B6			call farewell
-					Invoke ExitProcess,0
+ 00000000  E8 00000016			call	introduction
+ 00000005  E8 00000030			call	getUserInput
+ 0000000A  E8 00000056			call	printPascalTriangle
+ 0000000F  E8 000000B2			call	farewell
+					Invoke	ExitProcess,0
  00000014  6A 00	   *	    push   +000000000h
  00000016  E8 00000000 E   *	    call   ExitProcess
  0000001B			main ENDP
 
-				; ------------------------------------------------------------
+				; -------------------------------------------------------------------------
 				; Name: introduction
 				; 
-				; Introduce the program title and introduction for the user.
+				; Introduce the program title and introduction to the user.
 				;
-				; Preconditions: none
+				; Preconditions: programTitle, programIntro, and extraCredit2 are defined
 				;
-				; Postconditions: none
+				; Postconditions: EDX is changed
 				;
-				; Receives: none
-				;
-				; Returns: none
-				; ------------------------------------------------------------
+				; Receives:
+				;		programTitle, programIntro, extraCredit2 are global variables
+				; -------------------------------------------------------------------------
  0000001B			introduction PROC
  0000001B  BA 00000000 R		mov		edx, OFFSET programTitle
  00000020  E8 00000000 E		call	WriteString
@@ -150,30 +151,33 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
  00000039  C3				ret
  0000003A			introduction ENDP
 
-				; -----------------------------------------------------------------------------------------
+				; -------------------------------------------------------------------
 				; Name: getUserInput
 				; 
-				; Gets an integer from the user and validates it to make sure its in the range 1-13.
+				; Gets and validates an integer from the user within the range 1-20.
 				;
-				; Preconditions: none
+				; Postconditions: EAX, EDX are changed
 				;
-				; Postconditions: none
+				; Receives: 
+				;		ROWS_MIN = minimum row value boundary
+				;		ROWS_MAX = maximum row value boundary
+				;		rowInputPrompt, errorMessage are global variables
 				;
-				; Receives: none
-				;
-				; Returns: userInput = validated user integer in range 1-13
-				; -----------------------------------------------------------------------------------------
+				; Returns: userInput = row integer value
+				; -------------------------------------------------------------------
  0000003A			getUserInput PROC
+					; Prompt the user for an integer.
  0000003A				_getInput:
  0000003A  BA 000000C4 R			mov		edx, OFFSET rowInputPrompt
  0000003F  E8 00000000 E			call	WriteString
  00000044  E8 00000000 E			call	ReadInt
- 00000049  83 F8 01				cmp		eax, ROWS_MIN
+ 00000049  83 F8 01				cmp		eax, ROWS_MIN				; check user input is >= 1
  0000004C  7C 0B				jl		_error
- 0000004E  83 F8 14				cmp		eax, ROWS_MAX
+ 0000004E  83 F8 14				cmp		eax, ROWS_MAX				; check user input is <= 20
  00000051  7F 06				jg		_error
  00000053  A3 0000015F R			mov		userInput, eax
  00000058  C3					ret
+					; Display an error message if input is outside 1-20 range.
  00000059				_error:
  00000059  BA 000000F3 R			mov		edx, OFFSET errorMessage
  0000005E  E8 00000000 E			call	WriteString
@@ -183,19 +187,19 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
 				; ------------------------------------------------------------
 				; Name: printPascalTriangle
 				; 
-				; Introduce the program title and introduction for the user.
+				; Prints pascal triangle based on row count from user input 
+				; until all rows are printed.
 				;
-				; Preconditions: none
+				; Preconditions: userInput contains validated row input value
 				;
-				; Postconditions: none
+				; Postconditions: ECX is changed
 				;
-				; Receives: none
-				;
-				; Returns: none
+				; Receives: userInput = row integer value
 				; ------------------------------------------------------------
  00000065			printPascalTriangle PROC
  00000065  E8 00000000 E		call	CrLf
  0000006A  8B 0D 0000015F R		mov		ecx, userInput
+					; Loop through each row sequentially while preserving the outer loop counter.
  00000070				_printRow:
  00000070  51					push	ecx
  00000071  E8 00000004				call	printPascalRow
@@ -204,69 +208,105 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
  00000079  C3				ret
  0000007A			printPascalTriangle ENDP
 
+				; -----------------------------------------------------------------------------
+				; Name: printPascalRow
+				; 
+				; Displays a single row of the Pascal triangle with proper values and spacing.
+				;
+				; Preconditions: ECX contains current outer loop countdown value
+				;
+				; Postconditions: EAX, EBX, EDX, ESI, and EDI are changed
+				;
+				; Receives:
+				;		ECX = current loop countdown index
+				;		userInput = row integer value
+				; ------------------------------------------------------------------------------
  0000007A			printPascalRow PROC
- 0000007A  A1 0000015F R		mov  eax, userInput
- 0000007F  2B C1			sub  eax, ecx         ; eax = current row 'n' (0-indexed)
- 00000081  8B D8			mov  ebx, eax         ; ebx = n (parameter for nChooseK)
+					; Calculate the current row number 'n' based on the loop counter countdown and initialize 'k' index counter to 0.
+ 0000007A  A1 0000015F R		mov		eax, userInput
+ 0000007F  2B C1			sub		eax, ecx			; eax = current row 'n'
+ 00000081  8B D8			mov		ebx, eax			; ebx = n value
+ 00000083  BF 00000000			mov		edi, 0				; edi = k counter
 					
- 00000083  BF 00000000			mov  edi, 0           ; edi = k counter (starts at 0)
- 00000088  8B D1			mov  edx, ecx         ; Save outer loop counter in EDX safely
+ 00000088				_rowLoop:
+ 00000088  3B FB				cmp		edi, ebx		; check k <= n
+ 0000008A  7F 11				jg		_finished
 
- 0000008A				_rowLoop:
- 0000008A  3B FB				cmp  edi, ebx         ; Loop while k <= n
- 0000008C  7F 11				jg   _rowFinished
-
- 0000008E  8B C7				mov  eax, edi         ; eax = k (parameter for nChooseK)
- 00000090  E8 00000012				call nChooseK         ; Calculates and prints the number
+ 0000008C  8B C7				mov		eax, edi		; eax = k
+ 0000008E  E8 00000010				call	nChooseK         
 					
- 00000095  B0 20				mov  al, ' '          ; Print a space spacer
- 00000097  E8 00000000 E			call WriteChar
+ 00000093  B0 20				mov		al, ' '
+ 00000095  E8 00000000 E			call	WriteChar
 
- 0000009C  47					inc  edi              ; k++
- 0000009D  EB EB				jmp  _rowLoop
+ 0000009A  47					inc		edi				; increase k for next nCk value
+ 0000009B  EB EB				jmp		_rowLoop
 
- 0000009F				_rowFinished:
- 0000009F  E8 00000000 E			call CrLf
- 000000A4  8B CA				mov  ecx, edx         ; Restore outer loop counter to ECX
- 000000A6  C3					ret
- 000000A7			printPascalRow ENDP
+ 0000009D				_finished:
+ 0000009D  E8 00000000 E			call	CrLf
+ 000000A2  C3					ret
+ 000000A3			printPascalRow ENDP
 
- 000000A7			nChooseK PROC
- 000000A7  53				push ebx              ; Preserve registers we will mutate
- 000000A8  51				push ecx
+				; --------------------------------------------------------------------------
+				; Name: nChooseK
+				; 
+				; Calculates and prints the current Pascal triangle element value using
+				; the multiplicative formula for nCk.
+				;
+				; Preconditions: EAX has k value, EBX has n value.
+				;
+				; Postconditions: EAX, EDX, and ESI are changed. EBX and ECX are preserved.
+				;
+				; Receives: 
+				;		EAX = 'k' index value
+				;		EBX = 'n' row value
+				;
+				; Returns: Calculated decimal value is printed onto console.
+				; ---------------------------------------------------------------------------
+ 000000A3			nChooseK PROC
+					; Preserve EBX/ECX registers. Setup multiplier/divisor with value '1'.
+ 000000A3  53				push	ebx
+ 000000A4  51				push	ecx
+ 000000A5  8B C8			mov		ecx, eax			; loop counter 'k' (limit)
+ 000000A7  B8 00000001			mov		eax, 1				; multiplier
+ 000000AC  BE 00000001			mov		esi, 1				; divisor
+ 000000B1  83 F9 00			cmp		ecx, 0				; skip loop if k=0
+ 000000B4  74 08			je		_printValue
+					; Calculate element value by multiplying 'n' values and dividing by 'k' values using multiplicative formula.
+ 000000B6				_calculate:
+ 000000B6  F7 E3				mul		ebx				; edx:eax = total * n
+ 000000B8  F7 F6				div		esi				; eax = total / divisor
+ 000000BA  4B					dec		ebx
+ 000000BB  46					inc		esi
+ 000000BC  E2 F8				loop	_calculate
+					; Print calculated element value and restore registers.
+ 000000BE				_printValue:
+ 000000BE  E8 00000000 E			call	WriteDec
+ 000000C3  59					pop		ecx
+ 000000C4  5B					pop		ebx
+ 000000C5  C3					ret
+ 000000C6			nChooseK ENDP
 
- 000000A9  8B C8			mov  ecx, eax         ; ecx = k (our loop limit)
- 000000AB  B8 00000001			mov  eax, 1           ; Running total starts at 1
- 000000B0  BE 00000001			mov  esi, 1           ; esi = running divisor (starts at 1)
-
- 000000B5  83 F9 00			cmp  ecx, 0           ; If k == 0, skip loop completely (result is 1)
- 000000B8  74 08			je   _printResult
-
- 000000BA				_calcLoop:
- 000000BA  F7 E3				mul  ebx              ; edx:eax = total * n
- 000000BC  F7 F6				div  esi              ; eax = total / divisor
-					
- 000000BE  4B					dec  ebx              ; n--
- 000000BF  46					inc  esi              ; divisor++
- 000000C0  E2 F8				loop _calcLoop        ; Decrements ECX and loops until ECX == 0
-
- 000000C2				_printResult:
- 000000C2  E8 00000000 E			call WriteDec
-					
- 000000C7  59					pop  ecx              ; Restore registers
- 000000C8  5B					pop  ebx
- 000000C9  C3					ret
- 000000CA			nChooseK ENDP
-
- 000000CA			farewell PROC
- 000000CA  E8 00000000 E		call CrlF
- 000000CF  BA 00000127 R		mov		edx, OFFSET farewellMessage
- 000000D4  E8 00000000 E		call	WriteString
- 000000D9			farewell ENDP
+				; -----------------------------------------------
+				; Name: farewell
+				;
+				; Displays a goodbye message to the user.
+				;
+				; Preconditions: farewellMessage is defined
+				;
+				; Postconditions: EDX is changed
+				;
+				; Receives: farewellMessage is a global variable
+				; -----------------------------------------------
+ 000000C6			farewell PROC
+ 000000C6  E8 00000000 E		call	CrLf
+ 000000CB  BA 00000127 R		mov		edx, OFFSET farewellMessage
+ 000000D0  E8 00000000 E		call	WriteString
+ 000000D5  C3				ret
+ 000000D6			farewell ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/16/26 15:22:06
-<Algorithms via Procedures and Modularization     (Proj4_gua  Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
+/Pascal Triangle Program    (Proj4_guardadd.asm		     Symbols 2 - 1
 
 
 
@@ -360,7 +400,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 00000163 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000000D9 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000D6 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -467,18 +507,18 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-farewell . . . . . . . . . . . .	P Near	 000000CA _TEXT	Length= 0000000F Public STDCALL
+farewell . . . . . . . . . . . .	P Near	 000000C6 _TEXT	Length= 00000010 Public STDCALL
 getUserInput . . . . . . . . . .	P Near	 0000003A _TEXT	Length= 0000002B Public STDCALL
   _getInput  . . . . . . . . . .	L Near	 0000003A _TEXT	
   _error . . . . . . . . . . . .	L Near	 00000059 _TEXT	
 introduction . . . . . . . . . .	P Near	 0000001B _TEXT	Length= 0000001F Public STDCALL
 main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001B Public STDCALL
-nChooseK . . . . . . . . . . . .	P Near	 000000A7 _TEXT	Length= 00000023 Public STDCALL
-  _calcLoop  . . . . . . . . . .	L Near	 000000BA _TEXT	
-  _printResult . . . . . . . . .	L Near	 000000C2 _TEXT	
-printPascalRow . . . . . . . . .	P Near	 0000007A _TEXT	Length= 0000002D Public STDCALL
-  _rowLoop . . . . . . . . . . .	L Near	 0000008A _TEXT	
-  _rowFinished . . . . . . . . .	L Near	 0000009F _TEXT	
+nChooseK . . . . . . . . . . . .	P Near	 000000A3 _TEXT	Length= 00000023 Public STDCALL
+  _calculate . . . . . . . . . .	L Near	 000000B6 _TEXT	
+  _printValue  . . . . . . . . .	L Near	 000000BE _TEXT	
+printPascalRow . . . . . . . . .	P Near	 0000007A _TEXT	Length= 00000029 Public STDCALL
+  _rowLoop . . . . . . . . . . .	L Near	 00000088 _TEXT	
+  _finished  . . . . . . . . . .	L Near	 0000009D _TEXT	
 printPascalTriangle  . . . . . .	P Near	 00000065 _TEXT	Length= 00000015 Public STDCALL
   _printRow  . . . . . . . . . .	L Near	 00000070 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
