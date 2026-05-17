@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
+Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:34:23
 /Pascal Triangle Program    (Proj4_guardadd.asm		     Page 1 - 1
 
 
@@ -139,7 +139,9 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
 				; Postconditions: EDX is changed
 				;
 				; Receives:
-				;		programTitle, programIntro, extraCredit2 are global variables
+				;		programTitle = program title
+				;		programIntro = program introduction
+				;		extraCredit2 = extra credit 2 message
 				; -------------------------------------------------------------------------
  0000001B			introduction PROC
  0000001B  BA 00000000 R		mov		edx, OFFSET programTitle
@@ -161,7 +163,8 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
 				; Receives: 
 				;		ROWS_MIN = minimum row value boundary
 				;		ROWS_MAX = maximum row value boundary
-				;		rowInputPrompt, errorMessage are global variables
+				;		rowInputPrompt = prompt for requesting user input value
+				;		errorMessage = message for out-of-bounds user input
 				;
 				; Returns: userInput = row integer value
 				; -------------------------------------------------------------------
@@ -213,16 +216,16 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
 				; 
 				; Displays a single row of the Pascal triangle with proper values and spacing.
 				;
-				; Preconditions: ECX contains current outer loop countdown value
+				; Preconditions: ECX contains current outer loop value
 				;
 				; Postconditions: EAX, EBX, EDX, ESI, and EDI are changed
 				;
 				; Receives:
-				;		ECX = current loop countdown index
+				;		ECX = current (outer) loop index value
 				;		userInput = row integer value
 				; ------------------------------------------------------------------------------
  0000007A			printPascalRow PROC
-					; Calculate the current row number 'n' based on the loop counter countdown and initialize 'k' index counter to 0.
+					; Calculate the current row number 'n' based on the outer loop counter and initialize 'k' index counter to 0.
  0000007A  A1 0000015F R		mov		eax, userInput
  0000007F  2B C1			sub		eax, ecx			; eax = current row 'n'
  00000081  8B D8			mov		ebx, eax			; ebx = n value
@@ -271,14 +274,14 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
  000000AC  BE 00000001			mov		esi, 1				; divisor
  000000B1  83 F9 00			cmp		ecx, 0				; skip loop if k=0
  000000B4  74 08			je		_printValue
-					; Calculate element value by multiplying 'n' values and dividing by 'k' values using multiplicative formula.
+					; Calculate element value by multiplying 'n' values and dividing by 'k' values using nCk formula.
  000000B6				_calculate:
  000000B6  F7 E3				mul		ebx				; edx:eax = total * n
  000000B8  F7 F6				div		esi				; eax = total / divisor
  000000BA  4B					dec		ebx
  000000BB  46					inc		esi
  000000BC  E2 F8				loop	_calculate
-					; Print calculated element value and restore registers.
+					; Print calculated value and restore registers.
  000000BE				_printValue:
  000000BE  E8 00000000 E			call	WriteDec
  000000C3  59					pop		ecx
@@ -295,7 +298,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
 				;
 				; Postconditions: EDX is changed
 				;
-				; Receives: farewellMessage is a global variable
+				; Receives: farewellMessage = goodbye message
 				; -----------------------------------------------
  000000C6			farewell PROC
  000000C6  E8 00000000 E		call	CrLf
@@ -305,7 +308,7 @@ Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
  000000D6			farewell ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:10:15
+Microsoft (R) Macro Assembler Version 14.44.35225.0	    05/17/26 13:34:23
 /Pascal Triangle Program    (Proj4_guardadd.asm		     Symbols 2 - 1
 
 

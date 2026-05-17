@@ -49,7 +49,9 @@ main ENDP
 ; Postconditions: EDX is changed
 ;
 ; Receives:
-;		programTitle, programIntro, extraCredit2 are global variables
+;		programTitle = program title
+;		programIntro = program introduction
+;		extraCredit2 = extra credit 2 message
 ; -------------------------------------------------------------------------
 introduction PROC
 	mov		edx, OFFSET programTitle
@@ -71,7 +73,8 @@ introduction ENDP
 ; Receives: 
 ;		ROWS_MIN = minimum row value boundary
 ;		ROWS_MAX = maximum row value boundary
-;		rowInputPrompt, errorMessage are global variables
+;		rowInputPrompt = prompt for requesting user input value
+;		errorMessage = message for out-of-bounds user input
 ;
 ; Returns: userInput = row integer value
 ; -------------------------------------------------------------------
@@ -123,16 +126,16 @@ printPascalTriangle ENDP
 ; 
 ; Displays a single row of the Pascal triangle with proper values and spacing.
 ;
-; Preconditions: ECX contains current outer loop countdown value
+; Preconditions: ECX contains current outer loop value
 ;
 ; Postconditions: EAX, EBX, EDX, ESI, and EDI are changed
 ;
 ; Receives:
-;		ECX = current loop countdown index
+;		ECX = current (outer) loop index value
 ;		userInput = row integer value
 ; ------------------------------------------------------------------------------
 printPascalRow PROC
-	; Calculate the current row number 'n' based on the loop counter countdown and initialize 'k' index counter to 0.
+	; Calculate the current row number 'n' based on the outer loop counter and initialize 'k' index counter to 0.
 	mov		eax, userInput
 	sub		eax, ecx			; eax = current row 'n'
 	mov		ebx, eax			; ebx = n value
@@ -181,14 +184,14 @@ nChooseK PROC
 	mov		esi, 1				; divisor
 	cmp		ecx, 0				; skip loop if k=0
 	je		_printValue
-	; Calculate element value by multiplying 'n' values and dividing by 'k' values using multiplicative formula.
+	; Calculate element value by multiplying 'n' values and dividing by 'k' values using nCk formula.
 	_calculate:
 		mul		ebx				; edx:eax = total * n
 		div		esi				; eax = total / divisor
 		dec		ebx
 		inc		esi
 		loop	_calculate
-	; Print calculated element value and restore registers.
+	; Print calculated value and restore registers.
 	_printValue:
 		call	WriteDec
 		pop		ecx
@@ -205,7 +208,7 @@ nChooseK ENDP
 ;
 ; Postconditions: EDX is changed
 ;
-; Receives: farewellMessage is a global variable
+; Receives: farewellMessage = goodbye message
 ; -----------------------------------------------
 farewell PROC
 	call	CrLf
